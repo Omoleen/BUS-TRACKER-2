@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import User, DriverRides, DriverProfile, PassengerRides, PassengerProfile, Passenger, Driver
+# from .models import User, DriverRides, DriverProfile, PassengerRides, PassengerProfile, Passenger, Driver
 from django.contrib.auth.admin import UserAdmin
+from .models import *
 
 
 @admin.register(User)
@@ -25,8 +26,8 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Driver)
 class CustomUserAdmin(UserAdmin):
     model = Driver
-    list_display = ('email', 'is_staff', 'is_active',)
-    list_filter = ('email', 'is_staff', 'is_active',)
+    list_display = ('email', 'is_active',)
+    list_filter = ('email', 'is_active',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
@@ -79,6 +80,14 @@ class PassengerProfileAdmin(admin.ModelAdmin):
 
 @admin.register(DriverProfile)
 class PassengerProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'available', 'verified', 'current_location', 'destination', 'in_trip')
+    list_display = ('user', 'available', 'verified', 'current_location', 'in_trip')
 
-# admin.site.register(User, CustomUserAdmin)
+
+@admin.register(Vehicle)
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ('tracking_id', 'plate_number', 'is_active')
+
+
+@admin.register(Route)
+class RouteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'start_location', 'destination_location', 'price')

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from sortedm2m.fields import SortedManyToManyField
 from django.contrib.auth.hashers import make_password
 
 
@@ -96,6 +97,23 @@ class CoDriver(User):
         proxy = True
 
 
+class Vehicle(models.Model):
+    # driver = models.OneToOneField(Driver, on_delete=models.SET_NULL, null=True, blank=True)
+    tracking_id = models.CharField(max_length=128)
+    plate_number = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
+
+
+class Route(models.Model):
+    # name = models.CharField(max_length=128, blank=True)
+    start_location = models.CharField(max_length=128)
+    destination_location = models.CharField(max_length=128)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f'Route {self.id}'
+
+
 class PassengerProfile(models.Model):
 
     class Payment(models.TextChoices):
@@ -111,13 +129,17 @@ class PassengerProfile(models.Model):
 
 class DriverProfile(models.Model):
     user = models.OneToOneField(Driver, on_delete=models.CASCADE)
-    available = models.BooleanField(default=False)
+    available = models.BooleanField(default=True)
     verifyID = models.BinaryField(null=True, blank=True)
     verified = models.BooleanField(default=False)
     current_location = models.TextField(blank=True)
     destination = models.TextField(blank=True)
     in_trip = models.BooleanField(default=False)
     wallet = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, blank=True, null=True, related_name='vehicle')
+    # journey = models.ManyToManyField(Route, related_name='route', null=True, blank=True)
+    journey = SortedManyToManyField(Route, blank=True, related_name='journey')
+    passengers = models.IntegerField(default=0,)
 
 
 class CoDriverProfile(models.Model):
@@ -136,6 +158,7 @@ class PassengerRides(models.Model):
         PROGRESS = "PROGRESS", 'Progress'
         COMPLETED = "COMPLETED", 'Completed'
         REQUESTED = "REQUESTED", 'Requested'
+
     class Payment(models.TextChoices):
         CARD = "CARD", 'Card'
         TRANSFER = "TRANSFER", 'Transfer'
@@ -145,7 +168,7 @@ class PassengerRides(models.Model):
     end_time = models.DateTimeField(auto_now=True)
     start_location = models.TextField()
     destination = models.TextField()
-    price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     status = models.CharField(max_length=128, choices=Status.choices, default=Status.REQUESTED)
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, blank=True, null=True, related_name='passenger_driver')
     payment_method = models.CharField(max_length=128, choices=Payment.choices, blank=True)
@@ -171,3 +194,6 @@ class CoDriverRides(models.Model):
     start_location = models.TextField()
     destination = models.TextField()
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, blank=True, null=True, related_name='driver')
+
+
+

@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'trackapi.apps.TrackapiConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'sortedm2m'
 ]
 
 MIDDLEWARE = [
