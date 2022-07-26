@@ -20,7 +20,7 @@ class PassengerSignUpView(APIView):
         return Response(reg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# update and view profile
+# update and view profile - passenger
 class PassengerProfileView(APIView):
     permission_classes = [AllowAny]
 
@@ -78,12 +78,20 @@ class PassengerRideView(APIView):
         profile_ride.status = data.get('status', profile_ride.status)
         profile_ride.save()
         prof_serializer = PassengerRideSerializer(instance=profile_ride)
-        return Response(prof_serializer.data, status=status.HTTP_200_OK)
-        # return Response(prof_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(prof_serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+class RouteScanView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        routes = Route.objects.all()
+        serializer = RouteSerializer(instance=routes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # scan for destination in routes
-class ProfileScan(APIView):
+class DriverScan(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
@@ -91,8 +99,8 @@ class ProfileScan(APIView):
 
         routes = Route.objects.filter(Q(destination_location__contains=data.get('destination').lower()) | Q(start_location__contains=data.get('pickup').lower()))  # check if destination is in routes
         # print(routes)
-        drivers = DriverProfile.objects.filter(in_trip=False, available=True, journey__in=routes, passengers__lt=18)  # check of route is in any driver's journey
-        # print(drivers)
+        drivers = DriverProfile.objects.filter(in_trip=False, available=True, journey__in=routes, passengers__lt=18).distinct()  # check of route is in any driver's journey
+        print(drivers)
         final = []
         start, dest = None, None
         for driver in drivers:
@@ -121,3 +129,60 @@ class ProfileScan(APIView):
         # {'message': 'successful'}
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# update and view profile - Driver
+class DriverProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk, *args, **kwargs):
+        # profiles = DriverProfile.objects.get(user_id=pk)
+        profile = get_object_or_404(DriverProfile.objects.all(), user_id=pk)
+        serializer = DriverProfileSerializer(instance=profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk, *args, **kwargs):
+        profile = get_object_or_404(DriverProfile.objects.all(), user_id=pk)
+        data = request.data
+        print(data)
+        profile.available = data.get('available', profile.available)
+        # profile.in_trip = data.get('in_trip', profile.in_trip)
+        profile.wallet = data.get('wallet', profile.wallet)
+        profile.destination = data.get('destination', profile.destination)
+        profile.current_location = data.get('current_location', profile.current_location)
+        if 'vehicle' in data.keys():
+            # profile.vehicle = get_object_or_404(Vehicle.objects.all(), id=data.get('vehicle', profile.vehicle))
+            if data.get('vehicle') is None:
+                profile.vehicle = None
+            elif data.get('vehicle'):
+                profile.vehicle = get_object_or_404(Vehicle.objects.all(), id=data.get('vehicle', profile.vehicle))
+        if 'journey' in data.keys():
+            if data.get('journey') is None:
+                profile.journey.clear()
+            elif data.get('journey'):
+                for i in data.get('journey'):
+                    profile.journey.add(get_object_or_404(Route.objects.all(), id=i))
+        profile.save()
+        serializer = DriverProfileSerializer(instance=profile)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+class DriverScanPassengers(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk, *args, **kwargs):
+        # profiles = DriverProfile.objects.get(user_id=pk)
+        print(request.data)
+        print(pk)
+        profile = get_object_or_404(Driver.objects.all(), id=pk)
+        print(profile)
+        passengers = PassengerRides.objects.filter(status='REQUESTED', driver=profile)
+        print(passengers)
+        serializer = PassengerRideSerializer(instance=passengers, many=True)
+        reply = {}
+        # print(dict(serializer.data))
+        # reply.update(dict(serializer.data))
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # def post(self, request, pk, *args, **kwargs):
+

@@ -133,6 +133,7 @@ class DriverProfile(models.Model):
     verifyID = models.BinaryField(null=True, blank=True)
     verified = models.BooleanField(default=False)
     current_location = models.TextField(blank=True)
+    present_location = models.ForeignKey(Route, on_delete=models.SET_NULL, default=None, blank=True, null=True, related_name='present_location')
     destination = models.TextField(blank=True)
     in_trip = models.BooleanField(default=False)
     wallet = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
@@ -140,6 +141,16 @@ class DriverProfile(models.Model):
     # journey = models.ManyToManyField(Route, related_name='route', null=True, blank=True)
     journey = SortedManyToManyField(Route, blank=True, related_name='journey')
     passengers = models.IntegerField(default=0,)
+
+    def __str__(self):
+        return f'Driver {self.id}'
+
+    # def save(self, *args, **kwargs):
+    #     self.present_location = get_object_or_404(Route.objects.all(), id=self.journey.values()[0].get('id'))
+    #
+    #
+    #     return super().save(*args, **kwargs)
+
 
 
 class CoDriverProfile(models.Model):

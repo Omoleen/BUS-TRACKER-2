@@ -70,7 +70,7 @@ class DriverRidesAdmin(admin.ModelAdmin):
 @admin.register(PassengerRides)
 class PassengerRidesAdmin(admin.ModelAdmin):
     # model = Passenger
-    list_display = ('user', 'start_time', 'end_time', 'start_location', 'destination', 'price')
+    list_display = ('user', 'start_time', 'end_time', 'start_location', 'destination', 'price', 'driver')
 
 
 @admin.register(PassengerProfile)
@@ -85,7 +85,7 @@ class PassengerProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
-    list_display = ('tracking_id', 'plate_number', 'is_active')
+    list_display = ('id', 'tracking_id', 'plate_number', 'is_active')
 
 
 @admin.register(Route)
