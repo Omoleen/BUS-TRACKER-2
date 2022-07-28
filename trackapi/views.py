@@ -160,8 +160,9 @@ class DriverProfileView(APIView):
             if data.get('journey') is None:
                 profile.journey.clear()
             elif data.get('journey'):
-                for i in data.get('journey'):
-                    profile.journey.add(get_object_or_404(Route.objects.all(), id=i))
+                profile.journey.add(get_object_or_404(Route.objects.all(), id__in=data.get('journey')))
+                # for i in data.get('journey'):
+                #     profile.journey.add(get_object_or_404(Route.objects.all(), id=i))
         profile.save()
         serializer = DriverProfileSerializer(instance=profile)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -179,10 +180,157 @@ class DriverScanPassengers(APIView):
         passengers = PassengerRides.objects.filter(status='REQUESTED', driver=profile)
         print(passengers)
         serializer = PassengerRideSerializer(instance=passengers, many=True)
-        reply = {}
-        # print(dict(serializer.data))
-        # reply.update(dict(serializer.data))
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # def post(self, request, pk, *args, **kwargs):
 
+
+class RouteView(APIView):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        routes = Route.objects.all()
+        return routes
+
+    def get(self, request, *args, **kwargs):
+
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                route = Route.objects.get(id=id)
+                serializer = RouteSerializer(route)
+        except:
+            routes = self.get_queryset()
+            serializer = RouteSerializer(routes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        new_route = Route.objects.create(start_location=data["start_location"], destination_location=data[
+            "destination_location"], price=data["price"])
+
+        new_route.save()
+
+        serializer = RouteSerializer(new_route)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, *args, **kwargs):
+        id = request.query_params["id"]
+        route_object = Route.objects.get(id=id)
+
+        data = request.data
+
+        route_object.start_location = data["start_location"]
+        route_object.destination_location = data["destination_location"]
+        route_object.price = data["price"]
+
+        route_object.save()
+
+        serializer = RouteSerializer(route_object)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def patch(self, request, *args, **kwargs):
+        route_object = Route.objects.get()
+        data = request.data
+
+        route_object.start_location = data.get("start_location", route_object.start_location)
+        route_object.destination_location = data.get("destination_location", route_object.destination_location)
+        route_object.price = data.get("price", route_object.price)
+
+        route_object.save()
+        serializer = RouteSerializer(route_object)
+
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def delete(self, request, *args, **kwargs):
+
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                Route.objects.get(id=id).delete()
+                return Response({'message': 'Route deleted'}, status=status.HTTP_200_OK)
+        except:
+            Route.objects.all().delete()
+            routes = self.get_queryset()
+            serializer = RouteSerializer(routes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class VehicleView(APIView):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        vehicles = Vehicle.objects.all()
+        return vehicles
+
+    def get(self, request, *args, **kwargs):
+
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                vehicle = Vehicle.objects.get(id=id)
+                serializer = VehicleSerializer(vehicle)
+        except:
+            vehicles = self.get_queryset()
+            serializer = VehicleSerializer(vehicles, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        new_vehicle = Vehicle.objects.create(tracking_id=data.get('tracking_id'), plate_number=data[
+            "plate_number"], is_active=data.get('is_active'))
+
+        new_vehicle.save()
+
+        serializer = VehicleSerializer(new_vehicle)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, *args, **kwargs):
+        id = request.query_params["id"]
+        vehicle_object = Route.objects.get(id=id)
+
+        data = request.data
+
+        vehicle_object.tracking_id = data["tracking_id"]
+        vehicle_object.plate_number = data["plate_number"]
+        vehicle_object.is_active = data["is_active"]
+
+        vehicle_object.save()
+
+        serializer = VehicleSerializer(vehicle_object)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def patch(self, request, *args, **kwargs):
+        id = request.query_params["id"]
+        vehicle_object = Route.objects.get(id=id)
+        data = request.data
+
+        vehicle_object.tracking_id = data.get("tracking_id", vehicle_object.tracking_id)
+        vehicle_object.plate_number = data.get("plate_number", vehicle_object.plate_number)
+        vehicle_object.is_active = data.get("is_active", vehicle_object.is_active)
+
+        vehicle_object.save()
+        serializer = VehicleSerializer(vehicle_object)
+
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    def delete(self, request, *args, **kwargs):
+
+        try:
+            id = request.query_params["id"]
+            if id != None:
+                Vehicle.objects.get(id=id).delete()
+                return Response({'message': 'Vehicle deleted'}, status=status.HTTP_200_OK)
+        except:
+            Vehicle.objects.all().delete()
+            routes = self.get_queryset()
+            serializer = VehicleSerializer(routes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

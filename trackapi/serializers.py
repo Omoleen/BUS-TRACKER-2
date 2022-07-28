@@ -63,3 +63,9 @@ class DriverProfileSerializer(ModelSerializer):
         read_only_fields = ['id', 'passengers']
 
 
+class VehicleSerializer(ModelSerializer):
+
+    class Meta:
+        model = Vehicle
+        fields = ['id', 'tracking_id', 'plate_number', 'is_active']
+        read_only_fields = ['id']
