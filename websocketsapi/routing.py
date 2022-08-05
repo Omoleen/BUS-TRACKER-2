@@ -1,5 +1,5 @@
 from django.urls import re_path, path
-from djangochannelsrestframework.consumers import view_as_consumer
+# from djangochannelsrestframework.consumers import view_as_consumer
 from .consumers import *
 from trackapi import views
 
