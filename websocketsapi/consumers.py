@@ -1,9 +1,9 @@
 # from django.contrib.auth.models import User
-from trackapi.serializers import *
+# from trackapi.serializers import *
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
 from djangochannelsrestframework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from trackapi.models import *
+# from trackapi.models import *
 from djangochannelsrestframework.consumers import AsyncAPIConsumer
 # from rest_framework import status
 # from rest_framework.response import Response
@@ -18,8 +18,8 @@ from djangochannelsrestframework.mixins import (
 
 class ConnConsumer(AsyncAPIConsumer):
     permission_classes = [AllowAny]
-    queryset = Route.objects.all()
-    serializer_class = RouteSerializer
+    # queryset = Route.objects.all()
+    # serializer_class = RouteSerializer
 
     async def accept(self, **kwargs):
         # await self.handle_user_logged_in.subscribe()
@@ -28,8 +28,8 @@ class ConnConsumer(AsyncAPIConsumer):
 
 class RouteWebsocketView(AsyncAPIConsumer):
     permission_classes = [AllowAny]
-    queryset = Route.objects.all()
-    serializer_class = RouteSerializer
+    # queryset = Route.objects.all()
+    # serializer_class = RouteSerializer
 
     async def accept(self, **kwargs):
         # await self.handle_user_logged_in.subscribe()
