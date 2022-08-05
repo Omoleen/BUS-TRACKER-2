@@ -1,7 +1,7 @@
 from django.urls import re_path, path
 # from djangochannelsrestframework.consumers import view_as_consumer
 from .consumers import *
-from trackapi import views
+# from trackapi import views
 
 websockets_urlpatterns = [
     re_path(r"^ws/routes/$", RouteWebsocketView.as_asgi()),

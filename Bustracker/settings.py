@@ -28,6 +28,7 @@ ALLOWED_HOSTS = ['127.0.0.1:8000', 'bushail.herokuapp.com/']
 # Application definition
 
 INSTALLED_APPS = [
+    'websocketsapi.apps.WebsocketsapiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'trackapi.apps.TrackapiConfig',
-    'websocketsapi.apps.WebsocketsapiConfig',
     'rest_framework',
     'corsheaders',
     'sortedm2m',
