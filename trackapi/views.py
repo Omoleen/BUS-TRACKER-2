@@ -170,7 +170,7 @@ class DriverProfileView(APIView):
 
 class DriverScanPassengers(APIView):
     permission_classes = [AllowAny]
-
+    # for drivers to see passengers in their present routes
     def get(self, request, pk, *args, **kwargs):
         # profiles = DriverProfile.objects.get(user_id=pk)
         print(request.data)
