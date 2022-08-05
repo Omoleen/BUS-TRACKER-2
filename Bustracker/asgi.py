@@ -13,17 +13,18 @@ from channels.auth import AuthMiddlewareStack, SessionMiddleware, CookieMiddlewa
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
+asgi_app = get_asgi_application()
 import websocketsapi.routing
-from django.urls import re_path, path
-from djangochannelsrestframework.consumers import view_as_consumer
-from websocketsapi.consumers import *
+# from django.urls import re_path, path
+# from djangochannelsrestframework.consumers import view_as_consumer
+# from websocketsapi.consumers import *
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Bustracker.settings')
 django.setup()
-# application = get_asgi_application()
+
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": asgi_app,
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
