@@ -22,7 +22,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1:8000', 'bushail.herokuapp.com/']
+ALLOWED_HOSTS = ['127.0.0.1', 'bushail.herokuapp.com/']
 
 
 # Application definition
@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Bustracker.wsgi.application'
+# WSGI_APPLICATION = 'Bustracker.wsgi.application'
 ASGI_APPLICATION = 'Bustracker.asgi.application'
 
 # redis
@@ -87,22 +87,22 @@ ASGI_APPLICATION = 'Bustracker.asgi.application'
 #     },
 # }
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
-        'CONFIG': {
-            # "host": 'amqp://guest:guest@127.0.0.1//',
-            "host": os.environ['CLOUDAMQP_URL']
-            # "host": 'amqp://guest:guest@127.0.0.1/asgi',
-        },
-    },
-}
-
 # CHANNEL_LAYERS = {
 #     'default': {
-#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#         'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
+#         'CONFIG': {
+#             "host": 'amqp://guest:guest@127.0.0.1//',
+#             # "host": os.environ['CLOUDAMQP_URL']
+#             # "host": 'amqp://guest:guest@127.0.0.1/asgi',
+#         },
 #     },
 # }
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -183,9 +183,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
-    ]
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication'
+    # ]
 }
 
 SIMPLE_JWT = {

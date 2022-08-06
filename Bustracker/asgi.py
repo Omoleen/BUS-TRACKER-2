@@ -23,31 +23,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Bustracker.settings')
 django.setup()
 
 
-application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    "websocket": AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                websocketsapi.routing.websockets_urlpatterns
-            )
-        )
-    ),
-    # Just HTTP for now. (We can add other protocols later.)
-})
-
-
-# application = ProtocolTypeRouter({
-#     "websocket": AuthMiddlewareStack(
-#         URLRouter(
-#             websocketsapi.routing.websockets_urlpatterns
-#         )
-#     ),
-# })
-
 # application = ProtocolTypeRouter({
 #     "http": get_asgi_application(),
-#     "websocket": CookieMiddleware(
-#         SessionMiddleware(
+#     "websocket": AllowedHostsOriginValidator(
+#         AuthMiddlewareStack(
 #             URLRouter(
 #                 websocketsapi.routing.websockets_urlpatterns
 #             )
@@ -55,3 +34,14 @@ application = ProtocolTypeRouter({
 #     ),
 #     # Just HTTP for now. (We can add other protocols later.)
 # })
+
+
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            websocketsapi.routing.websockets_urlpatterns
+        )
+    ),
+})
+
