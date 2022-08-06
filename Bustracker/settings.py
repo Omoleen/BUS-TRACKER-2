@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'sortedm2m',
-    'channels',
-
+    # 'channels',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Bustracker.wsgi.application'
-ASGI_APPLICATION = 'Bustracker.asgi.application'
+# ASGI_APPLICATION = 'Bustracker.asgi.application'
 
 # redis
 # CHANNEL_LAYERS = {
@@ -101,11 +100,11 @@ ASGI_APPLICATION = 'Bustracker.asgi.application'
 #     },
 # }
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
