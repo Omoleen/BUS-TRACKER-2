@@ -20,7 +20,7 @@ import websocketsapi.routing
 # from websocketsapi.consumers import *
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Bustracker.settings')
-django.setup()
+# django.setup()
 
 
 # application = ProtocolTypeRouter({
@@ -37,7 +37,7 @@ django.setup()
 
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    # "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter(
             websocketsapi.routing.websockets_urlpatterns

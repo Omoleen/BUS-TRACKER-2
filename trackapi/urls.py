@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     path('route/scan/', RouteScanView.as_view()),
-    path('passenger/signup/', PassengerSignUpView.as_view()),
+    path('signup/', SignUpView.as_view()),
     path('passenger/profile/<int:pk>/', PassengerProfileView.as_view()),
     path('passenger/profile/<int:pk>/ride/', PassengerRideView.as_view()),
     path('passenger/profile/scan/', DriverScan.as_view()),

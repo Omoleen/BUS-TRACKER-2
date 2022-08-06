@@ -6,16 +6,41 @@ from .serializers import *
 from .models import *
 from rest_framework.generics import *
 from django.db.models import Q
+from rest_framework.schemas import ManualSchema
+import coreschema
+import coreapi
 
 
-class PassengerSignUpView(APIView):
+class SignUpView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "email",
+            required=True,
+            location="form",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "password",
+            required=True,
+            location="form",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "role",
+            required=False,
+            location="form",
+            schema=coreschema.String(description="default: PASSENGER, PASSENGER or ADMIN"),
+        ),
+    ],
+    )
 
     def post(self, request, *args, **kwargs):
-        reg_serializer = PassengerSignUpSerializer(data=request.data)
+        request.data['role'] = request.data.get('role', 'PASSENGER')
+        reg_serializer = SignUpSerializer(data=request.data)
         if reg_serializer.is_valid():
-            new_passenger = reg_serializer.save()
-            if new_passenger:
+            new_user = reg_serializer.save()
+            if new_user:
                 return Response(status=status.HTTP_201_CREATED)
         return Response(reg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -23,6 +48,21 @@ class PassengerSignUpView(APIView):
 # update and view profile - passenger
 class PassengerProfileView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "id",
+            required=True,
+            location="path",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "payment_method",
+            required=False,
+            location="form",
+            schema=coreschema.String()
+        ),
+    ]
+    )
 
     def get(self, request, pk, *args, **kwargs):
         profiles = PassengerProfile.objects.get(user_id=pk)
@@ -46,6 +86,44 @@ class PassengerProfileView(APIView):
 # function to book a a ride
 class PassengerRideView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "id",
+            required=True,
+            location="path",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "pickup",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "destination",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "driver",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='driver id')
+        ),
+        coreapi.Field(
+            "price",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='automatically calculated by the backend')
+        ),
+        coreapi.Field(
+            "status",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='default status: REQUESTED, choices are COMPLETED, PROGRESS, CANCELLED')
+        ),
+    ])
 
     # get all rides taken in the past
     def get(self, request, pk, *args, **kwargs):
@@ -134,6 +212,51 @@ class DriverScan(APIView):
 # update and view profile - Driver
 class DriverProfileView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "id",
+            required=True,
+            location="path",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "available",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='Boolean')
+        ),
+        coreapi.Field(
+            "wallet",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='e.g wallet value')
+        ),
+        coreapi.Field(
+            "destination",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "current_location",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "vehicle",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='"null" to initialize driver to no vehicle')
+        ),
+        coreapi.Field(
+            "journey",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='A list of routes')
+        ),
+    ]
+    )
 
     def get(self, request, pk, *args, **kwargs):
         # profiles = DriverProfile.objects.get(user_id=pk)
@@ -187,6 +310,33 @@ class DriverScanPassengers(APIView):
 
 class RouteView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "id",
+            required=False,
+            location="query",
+            schema=coreschema.String(description='to query trip details')
+        ),
+        coreapi.Field(
+            "start_location",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "destination_location",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='location should be valid in routes')
+        ),
+        coreapi.Field(
+            "price",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='cost of route')
+        ),
+    ]
+    )
 
     def get_queryset(self):
         routes = Route.objects.all()
@@ -233,7 +383,8 @@ class RouteView(APIView):
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def patch(self, request, *args, **kwargs):
-        route_object = Route.objects.get()
+        id = request.query_params["id"]
+        route_object = Route.objects.get(id=id)
         data = request.data
 
         route_object.start_location = data.get("start_location", route_object.start_location)
@@ -262,6 +413,33 @@ class RouteView(APIView):
 
 class VehicleView(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "id",
+            required=False,
+            location="query",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "tracking_id",
+            required=False,
+            location="form",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "plate_number",
+            required=False,
+            location="form",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "is_active",
+            required=False,
+            location="form",
+            schema=coreschema.String(description='Boolean')
+        ),
+    ]
+    )
 
     def get_queryset(self):
         vehicles = Vehicle.objects.all()

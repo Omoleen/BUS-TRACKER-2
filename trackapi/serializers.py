@@ -2,19 +2,22 @@ from rest_framework.serializers import ModelSerializer
 from .models import *
 
 
-class PassengerSignUpSerializer(ModelSerializer):
+class SignUpSerializer(ModelSerializer):
 
     class Meta:
-        model = Passenger
-        fields = ['id', 'email', 'password']
+        model = User
+        fields = ['id', 'email', 'password', 'role']
         read_only_fields = ['id']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        print(f'validated_data: {validated_data}')
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password is not None:
             instance.set_password(password)
+            if validated_data.get('role') == 'ADMIN':
+                instance.is_staff = True
         instance.save()
         return instance
 

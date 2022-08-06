@@ -2,6 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import dotenv
+import django_heroku
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,6 +29,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'bushail.herokuapp.com/']
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework_swagger',
     'websocketsapi.apps.WebsocketsapiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'sortedm2m',
-    'channels'
+    'channels',
+
 ]
 
 MIDDLEWARE = [
@@ -73,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'Bustracker.wsgi.application'
+WSGI_APPLICATION = 'Bustracker.wsgi.application'
 ASGI_APPLICATION = 'Bustracker.asgi.application'
 
 # redis
@@ -185,7 +188,8 @@ REST_FRAMEWORK = {
     ],
     # 'DEFAULT_AUTHENTICATION_CLASSES': [
     #     'rest_framework_simplejwt.authentication.JWTAuthentication'
-    # ]
+    # ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 SIMPLE_JWT = {
@@ -219,3 +223,5 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+django_heroku.settings(locals())

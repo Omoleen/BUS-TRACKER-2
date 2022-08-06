@@ -14,7 +14,6 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        # user.set_password(make_password(password))
         user.save()
         return user
 
@@ -37,7 +36,7 @@ class User(AbstractUser):
         DRIVER = "DRIVER", 'Driver'
         CODRIVER = "CODRIVER", 'CoDriver'
 
-    base_role = Role.PASSENGER
+    # base_role = Role.PASSENGER
 
     role = models.CharField(max_length=25, choices=Role.choices)
     username = None
@@ -48,11 +47,12 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.role = self.base_role
-            # self.password = self.set_password(kwargs.get('password'))
-            return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:
+    #         if not self.role:
+    #             self.role = self.base_role
+    #         # self.password = self.set_password(kwargs.get('password'))
+    #         return super().save(*args, **kwargs)
 
 
 class PassengerManager(BaseUserManager):
@@ -64,6 +64,20 @@ class PassengerManager(BaseUserManager):
 class Passenger(User):
     objects = PassengerManager()
     base_role = User.Role.PASSENGER
+
+    class Meta:
+        proxy = True
+
+
+class AdminManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=User.Role.ADMIN)
+
+
+class ADMIN(User):
+    objects = AdminManager()
+    base_role = User.Role.ADMIN
 
     class Meta:
         proxy = True

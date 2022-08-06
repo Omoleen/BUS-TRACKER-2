@@ -10,13 +10,13 @@ def create_passenger_profile(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Driver)
-def create_passenger_profile(sender, instance, created, **kwargs):
+def create_driver_profile(sender, instance, created, **kwargs):
     if created and instance.role == "DRIVER":
         DriverProfile.objects.create(user=instance)
 
 
 @receiver(post_save, sender=CoDriver)
-def create_passenger_profile(sender, instance, created, **kwargs):
+def create_co_driver_profile(sender, instance, created, **kwargs):
     if created and instance.role == "CODRIVER":
         CoDriverProfile.objects.create(user=instance)
 
