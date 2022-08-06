@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'sortedm2m',
+    'drf_yasg'
     # 'channels',
 ]
 

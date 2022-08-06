@@ -171,9 +171,24 @@ class RouteScanView(APIView):
 # scan for destination in routes
 class DriverScan(APIView):
     permission_classes = [AllowAny]
+    schema = ManualSchema(fields=[
+        coreapi.Field(
+            "pickup",
+            required=True,
+            location="query",
+            schema=coreschema.String()
+        ),
+        coreapi.Field(
+            "destination",
+            required=True,
+            location="query",
+            schema=coreschema.String()
+        ),
+    ],
+    )
 
     def get(self, request, *args, **kwargs):
-        data = request.data
+        data = request.query_params
 
         routes = Route.objects.filter(Q(destination_location__contains=data.get('destination').lower()) | Q(start_location__contains=data.get('pickup').lower()))  # check if destination is in routes
         # print(routes)
