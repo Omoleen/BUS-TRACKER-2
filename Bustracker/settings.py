@@ -224,3 +224,5 @@ SIMPLE_JWT = {
 }
 
 django_heroku.settings(locals())
+
+# web: daphne Bustracker.asgi:application --port $PORT --bind 0.0.0.0 -v2
