@@ -78,7 +78,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Bustracker.wsgi.application'
-ASGI_APPLICATION = 'Bustracker.asgi.application'
+# ASGI_APPLICATION = 'Bustracker.asgi.application'
+ASGI_APPLICATION = 'websockets.routing.application'
 
 # redis
 # CHANNEL_LAYERS = {
