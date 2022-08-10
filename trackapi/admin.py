@@ -70,7 +70,7 @@ class DriverRidesAdmin(admin.ModelAdmin):
 @admin.register(PassengerRides)
 class PassengerRidesAdmin(admin.ModelAdmin):
     # model = Passenger
-    list_display = ('user', 'start_time', 'end_time', 'start_location', 'destination', 'price', 'driver')
+    list_display = ('id', 'user', 'start_time', 'end_time', 'start_location', 'destination', 'price', 'driver')
 
 
 @admin.register(PassengerProfile)

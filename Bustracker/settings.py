@@ -2,7 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import dotenv
-import django_heroku
+# import django_heroku
 import dj_database_url
 
 
@@ -24,12 +24,13 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'bushail.herokuapp.com/']
+ALLOWED_HOSTS = ['127.0.0.1', 'bushail.herokuapp.com/', '*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'rest_framework_swagger',
     'websocketsapi.apps.WebsocketsapiConfig',
     'django.contrib.admin',
@@ -42,8 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'sortedm2m',
-    'drf_yasg'
-    # 'channels',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Bustracker.wsgi.application'
-# ASGI_APPLICATION = 'Bustracker.asgi.application'
+ASGI_APPLICATION = 'Bustracker.asgi.application'
 
 # redis
 # CHANNEL_LAYERS = {
@@ -91,16 +91,16 @@ WSGI_APPLICATION = 'Bustracker.wsgi.application'
 #     },
 # }
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
-#         'CONFIG': {
-#             "host": 'amqp://guest:guest@127.0.0.1//',
-#             # "host": os.environ['CLOUDAMQP_URL']
-#             # "host": 'amqp://guest:guest@127.0.0.1/asgi',
-#         },
-#     },
-# }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
+        'CONFIG': {
+            # "host": 'amqp://guest:guest@127.0.0.1//',
+            "host": os.environ['CLOUDAMQP_URL']
+            # "host": 'amqp://guest:guest@127.0.0.1/asgi',
+        },
+    },
+}
 
 # CHANNEL_LAYERS = {
 #     'default': {
@@ -227,6 +227,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
 
 # web: daphne Bustracker.asgi:application --port $PORT --bind 0.0.0.0 -v2
+# web: gunicorn Bustracker.wsgi --log-file -

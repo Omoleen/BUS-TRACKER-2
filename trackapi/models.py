@@ -140,6 +140,9 @@ class PassengerProfile(models.Model):
     in_ride = models.BooleanField(default=False)
     wallet = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
+    def __str__(self):
+        return f'Passenger {self.user_id}'
+
 
 class DriverProfile(models.Model):
     user = models.OneToOneField(Driver, on_delete=models.CASCADE)
@@ -157,13 +160,20 @@ class DriverProfile(models.Model):
     passengers = models.IntegerField(default=0,)
 
     def __str__(self):
-        return f'Driver {self.id}'
+        return f'Driver {self.user_id}'
 
-    # def save(self, *args, **kwargs):
-    #     self.present_location = get_object_or_404(Route.objects.all(), id=self.journey.values()[0].get('id'))
-    #
-    #
-    #     return super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # to update the current location of a driver
+        try:
+            self.current_location = self.journey.all()[0].start_location
+        except:
+            self.current_location = ''
+        # present trip
+        try:
+            self.present_location = self.journey.all()[0]
+        except:
+            self.present_location = None
+        return super().save(*args, **kwargs)
 
 
 
@@ -202,6 +212,9 @@ class PassengerRides(models.Model):
         self.payment_method = PassengerProfile.objects.get(user=self.user).payment_method
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'Passenger Ride - {self.user_id}'
+
 
 class DriverRides(models.Model):
     user = models.ForeignKey(Driver, on_delete=models.CASCADE)
@@ -210,6 +223,9 @@ class DriverRides(models.Model):
     start_location = models.TextField()
     destination = models.TextField()
     co_driver = models.ForeignKey(CoDriver, on_delete=models.SET_NULL, blank=True, null=True, related_name='co_driver')
+
+    def __str__(self):
+        return f'Driver Ride - {self.user_id}'
 
 
 class CoDriverRides(models.Model):

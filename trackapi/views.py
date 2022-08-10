@@ -136,7 +136,7 @@ class PassengerRideView(APIView):
         data = request.data
         new_ride = PassengerRides.objects.create(user_id=pk, start_location=data['pickup'],
                                                  destination=data['destination'],
-                                                 driver=data['driver'])
+                                                 driver=Driver.objects.get(id=data['driver']))
         serializer = PassengerRideSerializer(instance=new_ride)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -283,8 +283,10 @@ class DriverProfileView(APIView):
         profile = get_object_or_404(DriverProfile.objects.all(), user_id=pk)
         data = request.data
         print(data)
+        print(profile)
+        print(data.get('journey'))
         profile.available = data.get('available', profile.available)
-        # profile.in_trip = data.get('in_trip', profile.in_trip)
+        profile.in_trip = data.get('in_trip', profile.in_trip)
         profile.wallet = data.get('wallet', profile.wallet)
         profile.destination = data.get('destination', profile.destination)
         profile.current_location = data.get('current_location', profile.current_location)
@@ -298,9 +300,15 @@ class DriverProfileView(APIView):
             if data.get('journey') is None:
                 profile.journey.clear()
             elif data.get('journey'):
-                profile.journey.add(get_object_or_404(Route.objects.all(), id__in=data.get('journey')))
-                # for i in data.get('journey'):
-                #     profile.journey.add(get_object_or_404(Route.objects.all(), id=i))
+                remove_route = [i*-1 for i in data.get('journey') if i < 0]
+                print(remove_route)
+                if len(remove_route) > 0:
+                    remove_route = Route.objects.filter(id__in=remove_route)
+                    check = [profile.journey.remove(i) for i in remove_route]
+                add_route = [i for i in data.get('journey') if i not in remove_route]
+                if len(add_route) > 0:
+                    add_route = Route.objects.filter(id__in=add_route)
+                    check = [profile.journey.add(i) for i in add_route]
         profile.save()
         serializer = DriverProfileSerializer(instance=profile)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -527,3 +535,19 @@ class VehicleView(APIView):
             serializer = VehicleSerializer(routes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TestView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        # to update the current location of a driver
+        driver = DriverProfile.objects.get(user_id=11, in_trip=False)
+        driver.current_location = driver.journey.all()[0].start_location
+        driver.save()
+        print(driver.current_location)
+        # present trip
+        driver.present_location = driver.journey.all()[0]
+        driver.save()
+
+        return Response({}, status=status.HTTP_200_OK)

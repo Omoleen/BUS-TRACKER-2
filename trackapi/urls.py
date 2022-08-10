@@ -12,4 +12,5 @@ urlpatterns = [
     path('driver/<int:pk>/scan/passengers/', DriverScanPassengers.as_view()),
     path('routes/', RouteView.as_view()),
     path('vehicles/', VehicleView.as_view()),
+    path('test/', TestView.as_view()),
 ]
